@@ -46,29 +46,34 @@ function Card({ product }) {
         localStorage.setItem("wishlistItems", JSON.stringify(updatedWishlist));
     };
     // Add product to cart
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!isLoggedIn) {
             alert("Please login first");
             return;
         }
 
-        const storedCart = JSON.parse(localStorage.getItem("cartItems")) || [];
-        const existingItem = storedCart.find((item) => item.id === product._id);
+        try {
+            const response = await fetch("http://localhost:5000/api/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    userId: "testUser",
+                    productId: product._id,
+                    quantity: 1,
+                }),
+            });
 
-        let updatedCart;
+            if (!response.ok) {
+                throw new Error("Failed to add to cart");
+            }
 
-        if (existingItem) {
-            updatedCart = storedCart.map((item) =>
-                item.id === product._id
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item
-            );
-        } else {
-            updatedCart = [...storedCart, { id: product._id, quantity: 1 }];
+            alert(`${product.name} added to cart`);
+        } catch (error) {
+            console.error(error);
+            alert("Failed to add product to cart");
         }
-
-        localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-        alert(`${product.name} added to cart`);
     };
 
     return (

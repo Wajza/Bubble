@@ -81,7 +81,9 @@ function Cart() {
             _id: item._id,
             name: item.productId?.name,
             price: item.productId?.price,
-            image: `/images/${item.productId?.image}`,
+            image: item.productId?.image?.startsWith("http")
+              ? item.productId.image
+              : new URL(`../assets/${item.productId?.image}`, import.meta.url).href,
             stock: item.productId?.stock,
             quantity: item.quantity,
             error: "",
