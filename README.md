@@ -133,3 +133,6 @@ src/
 * Login state is simulated for testing purposes
 * Figma design will be provided separately
 * Repository uses .gitignore to exclude node_modules and sensitive files
+
+
+-----
