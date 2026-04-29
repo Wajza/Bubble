@@ -85,7 +85,7 @@ function Customize() {
                 },
                 body: JSON.stringify({
                     userId: "testUser",
-                    productId: "custom-soap",
+                    productId: "69f1bff117c164261da2bf6e",
                     quantity: 1,
                     customOptions: {
                         scents: selectedScents,

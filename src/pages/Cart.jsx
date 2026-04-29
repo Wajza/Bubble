@@ -77,17 +77,63 @@ function Cart() {
         const data = await response.json();
 
         setCartItems(
-          data.map((item) => ({
-            _id: item._id,
-            name: item.productId?.name,
-            price: item.productId?.price,
-            image: item.productId?.image?.startsWith("http")
-              ? item.productId.image
-              : new URL(`../assets/${item.productId?.image}`, import.meta.url).href,
-            stock: item.productId?.stock,
-            quantity: item.quantity,
-            error: "",
-          }))
+          data.map((item) => {
+            const isCustom = item.productId?.name === "Custom Soap";
+
+            const basePrice = item.productId?.price || 0;
+
+            const scentPrices = {
+              Lavender: 1,
+              Coconut: 1,
+              Rose: 1,
+              Honey: 2,
+            };
+
+            const ingredientPrices = {
+              "Shea Butter": 2,
+              Sugar: 1,
+              "Aloe Vera": 2,
+              Oils: 1,
+              "Vitamin E": 2,
+              "Coconut Oil": 2,
+              Charcoal: 3,
+            };
+
+            const texturePrice =
+              item.customOptions?.texture === "Scrub" ? 2 : 0;
+
+            const scentsTotal = (item.customOptions?.scents || []).reduce(
+              (sum, s) => sum + (scentPrices[s] || 0),
+              0
+            );
+
+            const ingredientsTotal = (item.customOptions?.ingredients || []).reduce(
+              (sum, i) => sum + (ingredientPrices[i] || 0),
+              0
+            );
+
+            const optionsPrice = scentsTotal + ingredientsTotal + texturePrice;
+            const totalPrice = basePrice + optionsPrice;
+
+            return {
+              _id: item._id,
+              name: item.productId?.name,
+              price: totalPrice,
+
+              image: isCustom
+                ? soap
+                : item.productId?.image?.startsWith("http")
+                  ? item.productId.image
+                  : new URL(`../assets/${item.productId?.image}`, import.meta.url).href,
+
+              stock: item.productId?.stock,
+              quantity: item.quantity,
+
+              customOptions: item.customOptions,
+
+              error: "",
+            };
+          })
         );
       } catch (error) {
         console.error("Failed to fetch cart:", error);
@@ -456,7 +502,28 @@ function Cart() {
                               alt={item.name}
                               style={productImageStyle}
                             />
-                            <span>{item.name}</span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+
+                              <span style={{ fontWeight: "500", minWidth: "110px" }}>
+                                {item.name}
+                              </span>
+
+                              {item.customOptions && (
+                                <div style={customDetailsBox}>
+                                  {item.customOptions.scents?.length > 0 && (
+                                    <div><strong>Scent:</strong> {item.customOptions.scents.join(", ")}</div>
+                                  )}
+
+                                  {item.customOptions.texture && (
+                                    <div><strong>Texture:</strong> {item.customOptions.texture}</div>
+                                  )}
+
+                                  {item.customOptions.ingredients?.length > 0 && (
+                                    <div><strong>Ingredients:</strong> {item.customOptions.ingredients.join(", ")}</div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </td>
 
@@ -679,7 +746,7 @@ const tdStyle = {
 const productCell = {
   display: "flex",
   alignItems: "center",
-  gap: "10px",
+  gap: "14px",
 };
 
 const productImageStyle = {
@@ -728,6 +795,22 @@ const errorStyle = {
   fontSize: "13px",
   marginTop: "6px",
   marginBottom: 0,
+};
+
+const customDetailsBox = {
+  marginTop: "6px",
+  padding: "6px 8px",
+  borderRadius: "10px",
+  background: "rgba(255,255,255,0.35)",
+  color: "#555",
+  fontSize: "12px",
+  lineHeight: "1.5",
+  textAlign: "left",
+  maxWidth: "230px",
+};
+
+const customDetailLine = {
+  marginBottom: "2px",
 };
 
 export default Cart;

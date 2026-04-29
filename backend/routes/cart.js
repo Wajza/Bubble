@@ -5,9 +5,13 @@ const Cart = require("../models/Cart");
 // Add to cart
 router.post("/", async (req, res) => {
   try {
-    const { userId, productId, quantity } = req.body;
+    const { userId, productId, quantity, customOptions } = req.body;
 
-    const existingItem = await Cart.findOne({ userId, productId });
+    let existingItem = null;
+
+    if (!customOptions) {
+      existingItem = await Cart.findOne({ userId, productId });
+    }
 
     if (existingItem) {
       existingItem.quantity += quantity || 1;
@@ -15,7 +19,12 @@ router.post("/", async (req, res) => {
       return res.status(200).json(existingItem);
     }
 
-    const cartItem = new Cart({ userId, productId, quantity: quantity || 1 });
+    const cartItem = new Cart({
+      userId,
+      productId,
+      quantity: quantity || 1,
+      customOptions
+    });
     await cartItem.save();
 
     res.status(201).json(cartItem);

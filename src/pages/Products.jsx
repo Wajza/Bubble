@@ -330,13 +330,17 @@ function Products() {
                 }}
               >
                 {/* Render each product card */}
-                {filteredProducts.map((product) => (
-                  <Card
-                    key={product._id}
-                    product={product}
-                    onWishlistClick={handleWishlistClick}
-                  />
-                ))}
+                {filteredProducts.map((product) => {
+                  if (product.isCustomizable === true) return null;
+
+                  return (
+                    <Card
+                      key={product._id}
+                      product={product}
+                      onWishlistClick={handleWishlistClick}
+                    />
+                  );
+                })}
               </div>
             ) : (
               <p
