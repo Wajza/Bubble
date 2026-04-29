@@ -292,49 +292,51 @@ function ProductManagement() {
                   alignItems: "flex-start",
                 }}
               >
-                {products.map((product) => (
-                  <div key={product._id || product.id} style={productCardStyle}>
-                    <img
-                      src={
-                        product.image?.startsWith("http")
-                          ? product.image
-                          : new URL(`../assets/${product.image}`, import.meta.url).href
-                      }
-                      alt={product.name}
-                      style={{
-                        width: "170px",
-                        height: "170px",
-                        objectFit: "contain",
-                        marginBottom: "12px",
-                      }}
-                    />
+                {products
+                  .filter((product) => !product.isCustomizable)
+                  .map((product) => (
+                    <div key={product._id || product.id} style={productCardStyle}>
+                      <img
+                        src={
+                          product.image?.startsWith("http")
+                            ? product.image
+                            : new URL(`../assets/${product.image}`, import.meta.url).href
+                        }
+                        alt={product.name}
+                        style={{
+                          width: "170px",
+                          height: "170px",
+                          objectFit: "contain",
+                          marginBottom: "12px",
+                        }}
+                      />
 
-                    <h3
-                      style={{
-                        margin: "0 0 28px",
-                        fontSize: "18px",
-                        color: "#2e3d4c",
-                        fontWeight: "500",
-                      }}
-                    >
-                      {product.name}
-                    </h3>
+                      <h3
+                        style={{
+                          margin: "0 0 28px",
+                          fontSize: "18px",
+                          color: "#2e3d4c",
+                          fontWeight: "500",
+                        }}
+                      >
+                        {product.name}
+                      </h3>
 
-                    <button
-                      style={purpleButtonStyle}
-                      onClick={() => handleDelete(product._id || product.id)}
-                    >
-                      Delete
-                    </button>
+                      <button
+                        style={purpleButtonStyle}
+                        onClick={() => handleDelete(product._id || product.id)}
+                      >
+                        Delete
+                      </button>
 
-                    <button
-                      style={{ ...purpleButtonStyle, marginTop: "10px" }}
-                      onClick={() => handleEdit(product)}
-                    >
-                      Edit Product
-                    </button>
-                  </div>
-                ))}
+                      <button
+                        style={{ ...purpleButtonStyle, marginTop: "10px" }}
+                        onClick={() => handleEdit(product)}
+                      >
+                        Edit Product
+                      </button>
+                    </div>
+                  ))}
               </div>
             </>
           ) : mode === "add" ? (

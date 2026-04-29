@@ -85,7 +85,7 @@ function Customize() {
                 },
                 body: JSON.stringify({
                     userId: "testUser",
-                    productId: "69f1bff117c164261da2bf6e",
+                    productId: "69f2661394ab1e163aa40d03",
                     quantity: 1,
                     customOptions: {
                         scents: selectedScents,
