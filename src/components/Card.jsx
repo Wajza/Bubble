@@ -227,7 +227,7 @@ function Card({ product }) {
                             onClick={handleAddToCart}
                         />
                         <Button
-                            text="Product Details"
+                            text="Details"
                             variant="purple"
                             onClick={() => navigate(`/product-details/${product._id}`)}
                         />
