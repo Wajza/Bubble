@@ -41,7 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/tickets", ticketRoutes);
 
-app.use("/api/admin", adminRoutes);
+app.use("/api/admin/dashboard", adminRoutes);
 app.use("/api/admin/products", adminProductsRoutes);
 app.use("/api/admin/inventory", adminInventoryRoutes);
 app.use("/api/admin/orders", adminOrdersRoutes);
