@@ -6,7 +6,31 @@ import bubble7 from "../assets/bubble7.png";
 import bubble8 from "../assets/bubble8.png";
 import heart from "../assets/heart.png";
 import heartFilled from "../assets/heart-filled.png";
-import profile from "../assets/profile-picture.png";
+
+// Profile Icon SVG (same as navbar)
+const ProfileIcon = ({ color = "#333", hoverColor = "#8f4bd8" }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const strokeColor = isHovered ? hoverColor : color;
+  
+  return (
+    <svg 
+      width="28" 
+      height="28" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke={strokeColor}
+      strokeWidth="2"
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      style={{ cursor: "pointer", transition: "all 0.3s ease" }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+};
 
 function ProductDetails() {
     const navigate = useNavigate();
@@ -23,6 +47,104 @@ function ProductDetails() {
     const [addedToCart, setAddedToCart] = useState(false);
     const [reviewText, setReviewText] = useState("");
     const [liked, setLiked] = useState(false);
+
+    // Get theme-based colors
+    const getThemeColors = (theme) => {
+        switch(theme) {
+            case 'purple':
+                return {
+                    background: "linear-gradient(135deg, #cbb7e6, #a88bd8)",
+                    buttonColor: "#8f4bd8",
+                    buttonHover: "#7a3fc2",
+                    secondaryButtonColor: "#b99af1",
+                    textColor: "#2e3d4c",
+                    accentColor: "#b99af1",
+                    borderColor: "rgba(168, 139, 216, 0.3)",
+                    cardBg: "rgba(255,255,255,0.12)",
+                    labelColor: "#7a58b8",
+                    valueColor: "#2e3d4c",
+                    reviewBg: "rgba(255,255,255,0.08)",
+                    reviewBorder: "rgba(168, 139, 216, 0.3)",
+                    bubbleOpacity: 0.12,
+                    iconColor: "#2e3d4c",
+                    iconHoverColor: "#7a3fc2"
+                };
+            case 'yellow':
+                return {
+                    background: "linear-gradient(135deg, #f5e6a3, #e8d47a)",
+                    buttonColor: "#d4a843",
+                    buttonHover: "#c29738",
+                    secondaryButtonColor: "#f0dc82",
+                    textColor: "#5c4a1e",
+                    accentColor: "#f0dc82",
+                    borderColor: "rgba(232, 212, 122, 0.3)",
+                    cardBg: "rgba(255,255,255,0.12)",
+                    labelColor: "#b8942a",
+                    valueColor: "#5c4a1e",
+                    reviewBg: "rgba(255,255,255,0.08)",
+                    reviewBorder: "rgba(232, 212, 122, 0.3)",
+                    bubbleOpacity: 0.15,
+                    iconColor: "#5c4a1e",
+                    iconHoverColor: "#c29738"
+                };
+            case 'green':
+                return {
+                    background: "linear-gradient(135deg, #a8e6cf, #7ecba1)",
+                    buttonColor: "#3d8f5e",
+                    buttonHover: "#2d6b46",
+                    secondaryButtonColor: "#9ed6b0",
+                    textColor: "#1a4d2e",
+                    accentColor: "#9ed6b0",
+                    borderColor: "rgba(126, 203, 161, 0.3)",
+                    cardBg: "rgba(255,255,255,0.12)",
+                    labelColor: "#2d6b46",
+                    valueColor: "#1a4d2e",
+                    reviewBg: "rgba(255,255,255,0.08)",
+                    reviewBorder: "rgba(126, 203, 161, 0.3)",
+                    bubbleOpacity: 0.12,
+                    iconColor: "#1a4d2e",
+                    iconHoverColor: "#2d6b46"
+                };
+            case 'blue':
+                return {
+                    background: "linear-gradient(135deg, #a8d8ea, #7cb8d4)",
+                    buttonColor: "#3a7ca5",
+                    buttonHover: "#2d6182",
+                    secondaryButtonColor: "#9cc9e0",
+                    textColor: "#1a3a4d",
+                    accentColor: "#9cc9e0",
+                    borderColor: "rgba(124, 184, 212, 0.3)",
+                    cardBg: "rgba(255,255,255,0.12)",
+                    labelColor: "#2d6182",
+                    valueColor: "#1a3a4d",
+                    reviewBg: "rgba(255,255,255,0.08)",
+                    reviewBorder: "rgba(124, 184, 212, 0.3)",
+                    bubbleOpacity: 0.12,
+                    iconColor: "#1a3a4d",
+                    iconHoverColor: "#2d6182"
+                };
+            default: // pink
+                return {
+                    background: "linear-gradient(135deg, #b45f69, #d8a0aa)",
+                    buttonColor: "#b84a57",
+                    buttonHover: "#9e3f4a",
+                    secondaryButtonColor: "#d99aa5",
+                    textColor: "#5a2d36",
+                    accentColor: "#d99aa5",
+                    borderColor: "rgba(216, 160, 170, 0.3)",
+                    cardBg: "rgba(255,255,255,0.12)",
+                    labelColor: "#b84a57",
+                    valueColor: "#5a2d36",
+                    reviewBg: "rgba(255,255,255,0.08)",
+                    reviewBorder: "rgba(216, 160, 170, 0.3)",
+                    bubbleOpacity: 0.18,
+                    iconColor: "#5a2d36",
+                    iconHoverColor: "#9e3f4a"
+                };
+        }
+    };
+
+    const [themeColors, setThemeColors] = useState(getThemeColors('pink'));
 
     // Handle screen resize
     useEffect(() => {
@@ -41,7 +163,7 @@ function ProductDetails() {
             .then((res) => res.json())
             .then((data) => {
                 setProduct(data);
-                // Reviews should come from backend, but for now use localStorage or empty array
+                setThemeColors(getThemeColors(data.theme));
                 const storedReviews = JSON.parse(localStorage.getItem(`reviews_${id}`)) || data.reviews || [];
                 setReviews(storedReviews);
                 setLoading(false);
@@ -73,7 +195,7 @@ function ProductDetails() {
 
     if (loading) {
         return (
-            <div className="pink-page" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: themeColors.background }}>
                 Loading product...
             </div>
         );
@@ -81,18 +203,11 @@ function ProductDetails() {
 
     if (!product) {
         return (
-            <div className="pink-page" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: themeColors.background }}>
                 Product not available
             </div>
         );
     }
-
-    const pageClass =
-        product.theme === "purple"
-            ? "purple-page"
-            : product.theme === "yellow"
-                ? "yellow-page"
-                : "pink-page";
 
     // Add product to cart
     const handleAddToCart = async () => {
@@ -194,30 +309,30 @@ function ProductDetails() {
         const updatedReviews = [...reviews, newReview];
         setReviews(updatedReviews);
         
-        // Save to localStorage (temp solution until backend review API is ready)
         localStorage.setItem(`reviews_${id}`, JSON.stringify(updatedReviews));
         
         setReviewText("");
         
-        // Show success message
         const successMsg = document.createElement("div");
         successMsg.textContent = "Review added!";
-        successMsg.style.cssText = "position:fixed;bottom:20px;right:20px;background:#39a86f;color:white;padding:10px 20px;border-radius:10px;z-index:1000";
+        successMsg.style.cssText = `position:fixed;bottom:20px;right:20px;background:${themeColors.buttonColor};color:white;padding:10px 20px;border-radius:10px;z-index:1000`;
         document.body.appendChild(successMsg);
         setTimeout(() => successMsg.remove(), 2000);
     };
 
     return (
         <div
-            className={pageClass}
             style={{
                 minHeight: "100vh",
                 position: "relative",
                 overflow: "hidden",
+                background: themeColors.background,
                 padding: isMobile ? "20px 16px 30px" : "30px 48px 24px",
                 boxSizing: "border-box",
+                transition: "background 0.5s ease-in-out",
             }}
         >
+            {/* Decorative bubbles */}
             <img
                 src={bubble7}
                 alt="bubble left"
@@ -226,9 +341,10 @@ function ProductDetails() {
                     left: isMobile ? "-50px" : "-10px",
                     bottom: "0",
                     width: isMobile ? "220px" : "360px",
-                    opacity: 0.18,
+                    opacity: themeColors.bubbleOpacity,
                     zIndex: 0,
                     pointerEvents: "none",
+                    transition: "opacity 0.5s ease-in-out",
                 }}
             />
 
@@ -240,28 +356,30 @@ function ProductDetails() {
                     right: isMobile ? "-40px" : "0",
                     top: "0",
                     width: isMobile ? "220px" : "360px",
-                    opacity: 0.16,
+                    opacity: themeColors.bubbleOpacity,
                     zIndex: 0,
                     pointerEvents: "none",
+                    transition: "opacity 0.5s ease-in-out",
                 }}
             />
             
-            {/* Go back to previous page */}
+            {/* Go back button */}
             <button
                 onClick={() => navigate(-1)}
                 style={{
                     padding: isMobile ? "12px 28px" : "14px 36px",
                     borderRadius: "30px",
-                    border: "1px solid rgba(255,255,255,0.4)",
+                    border: `1px solid ${themeColors.borderColor}`,
                     background: "rgba(255,255,255,0.08)",
                     backdropFilter: "blur(12px)",
-                    color: "#3b3b3b",
+                    color: themeColors.textColor,
                     fontSize: isMobile ? "16px" : "18px",
                     fontFamily: "Josefin Sans, sans-serif",
                     cursor: "pointer",
                     marginBottom: "18px",
                     position: "relative",
                     zIndex: 2,
+                    transition: "all 0.3s ease",
                 }}
             >
                 ← Back
@@ -277,6 +395,7 @@ function ProductDetails() {
                     alignItems: isMobile ? "stretch" : "flex-start",
                 }}
             >
+                {/* Product Image */}
                 <div
                     style={{
                         flex: 1,
@@ -298,11 +417,7 @@ function ProductDetails() {
                         alt={product.name}
                         style={{
                             width: "100%",
-                            maxWidth: isMobile
-                                ? "320px"
-                                : product.theme === "purple"
-                                    ? "650px"
-                                    : "700px",
+                            maxWidth: isMobile ? "320px" : "650px",
                             objectFit: "contain",
                             filter: "drop-shadow(0px 24px 40px rgba(0,0,0,0.16))",
                             display: "block",
@@ -310,6 +425,7 @@ function ProductDetails() {
                     />
                 </div>
 
+                {/* Product Info */}
                 <div
                     style={{
                         width: isMobile ? "100%" : "390px",
@@ -321,29 +437,35 @@ function ProductDetails() {
                         order: isMobile ? 2 : 0,
                     }}
                 >
-                    <div style={box(isMobile)}>
-                        <p style={labelStyle(isMobile)}>Description</p>
-                        <p style={valueStyle(isMobile)}>{product.description}</p>
+                    {/* Description */}
+                    <div style={box(isMobile, themeColors)}>
+                        <p style={labelStyle(isMobile, themeColors)}>Description</p>
+                        <p style={valueStyle(isMobile, themeColors)}>{product.description}</p>
                     </div>
 
-                    <div style={box(isMobile)}>
-                        <p style={labelStyle(isMobile)}>Price: ${product.price.toFixed(2)}</p>
+                    {/* Price */}
+                    <div style={box(isMobile, themeColors)}>
+                        <p style={labelStyle(isMobile, themeColors)}>Price</p>
+                        <p style={priceStyle(isMobile, themeColors)}>${product.price.toFixed(2)}</p>
                     </div>
 
-                    <div style={box(isMobile)}>
-                        <p style={labelStyle(isMobile)}>Ingredients</p>
-                        <p style={valueStyle(isMobile)}>{product.ingredients?.join(", ")}</p>
+                    {/* Ingredients */}
+                    <div style={box(isMobile, themeColors)}>
+                        <p style={labelStyle(isMobile, themeColors)}>Ingredients</p>
+                        <p style={valueStyle(isMobile, themeColors)}>{product.ingredients?.join(", ")}</p>
                     </div>
 
-                    <div style={box(isMobile)}>
-                        <p style={labelStyle(isMobile)}>
+                    {/* Stock */}
+                    <div style={box(isMobile, themeColors)}>
+                        <p style={labelStyle(isMobile, themeColors)}>
                             {product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"}
                         </p>
                     </div>
 
+                    {/* Actions */}
                     <div
                         style={{
-                            ...box(isMobile),
+                            ...box(isMobile, themeColors),
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
@@ -369,6 +491,18 @@ function ProductDetails() {
                                 style={{
                                     width: "170px",
                                     borderRadius: "14px",
+                                    background: themeColors.buttonColor,
+                                    transition: "all 0.3s ease"
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (product.stock > 0) {
+                                        e.currentTarget.style.background = themeColors.buttonHover;
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (product.stock > 0) {
+                                        e.currentTarget.style.background = themeColors.buttonColor;
+                                    }
                                 }}
                                 onClick={handleAddToCart}
                             />
@@ -417,8 +551,9 @@ function ProductDetails() {
                         )}
                     </div>
 
-                    <div style={{ ...box(isMobile), paddingTop: "14px", paddingBottom: "14px" }}>
-                        <p style={labelStyle(isMobile)}>Reviews ({reviews.length})</p>
+                    {/* Reviews */}
+                    <div style={{ ...box(isMobile, themeColors), paddingTop: "14px", paddingBottom: "14px" }}>
+                        <p style={labelStyle(isMobile, themeColors)}>Reviews ({reviews.length})</p>
 
                         <div
                             style={{
@@ -428,7 +563,7 @@ function ProductDetails() {
                                 marginBottom: "12px",
                             }}
                         >
-                            <img src={profile} alt="profile" style={reviewIconStyle(isMobile)} />
+                            <ProfileIcon color={themeColors.iconColor} hoverColor={themeColors.iconHoverColor} />
 
                             <input
                                 type="text"
@@ -439,9 +574,9 @@ function ProductDetails() {
                                     flex: 1,
                                     padding: "11px 14px",
                                     borderRadius: "18px",
-                                    background: "rgba(255,255,255,0.08)",
-                                    border: "1px solid rgba(255,255,255,0.25)",
-                                    color: "#7a4c56",
+                                    background: themeColors.reviewBg,
+                                    border: `1px solid ${themeColors.reviewBorder}`,
+                                    color: themeColors.valueColor,
                                     fontSize: "14px",
                                     fontFamily: "Josefin Sans, sans-serif",
                                     outline: "none",
@@ -456,11 +591,12 @@ function ProductDetails() {
                                     padding: isMobile ? "10px 12px" : "10px 14px",
                                     borderRadius: "12px",
                                     border: "none",
-                                    background: reviewText.trim() ? "#8f4bd8" : "#ccc",
+                                    background: reviewText.trim() ? themeColors.buttonColor : "#ccc",
                                     color: "white",
                                     cursor: reviewText.trim() ? "pointer" : "not-allowed",
                                     fontFamily: "Josefin Sans, sans-serif",
                                     opacity: reviewText.trim() ? 1 : 0.6,
+                                    transition: "all 0.3s ease",
                                 }}
                             >
                                 Send
@@ -484,18 +620,18 @@ function ProductDetails() {
                         {/* Display reviews */}
                         {reviews.length > 0 ? (
                             reviews.map((review, index) => (
-                                <div key={review.id || index} style={reviewStyle(isMobile)}>
-                                    <img src={profile} alt="profile" style={reviewIconStyle(isMobile)} />
+                                <div key={review.id || index} style={reviewStyle(isMobile, themeColors)}>
+                                    <ProfileIcon color={themeColors.iconColor} hoverColor={themeColors.iconHoverColor} />
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                                            <strong style={{ fontSize: "13px", color: "#5b3b45" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px", flexWrap: "wrap", gap: "5px" }}>
+                                            <strong style={{ fontSize: "13px", color: themeColors.labelColor }}>
                                                 {review.userName || "Anonymous"}
                                             </strong>
                                             {review.date && (
                                                 <span style={{ fontSize: "10px", color: "#999" }}>{review.date}</span>
                                             )}
                                         </div>
-                                        <span style={{ fontSize: "14px" }}>{review.text || review}</span>
+                                        <span style={{ fontSize: "14px", color: themeColors.valueColor }}>{review.text || review}</span>
                                     </div>
                                 </div>
                             ))
@@ -511,51 +647,54 @@ function ProductDetails() {
     );
 }
 
-const box = (isMobile) => ({
-    background: "rgba(255,255,255,0.10)",
-    border: "1px solid rgba(255,255,255,0.28)",
+// Styled components that change with theme
+const box = (isMobile, themeColors) => ({
+    background: themeColors.cardBg,
+    border: `1px solid ${themeColors.borderColor}`,
     borderRadius: isMobile ? "22px" : "24px",
     padding: isMobile ? "14px 16px" : "16px 18px",
     backdropFilter: "blur(12px)",
     boxSizing: "border-box",
+    transition: "all 0.3s ease",
 });
 
-const labelStyle = (isMobile) => ({
+const labelStyle = (isMobile, themeColors) => ({
     margin: "0 0 8px 0",
-    color: "#a55562",
+    color: themeColors.labelColor,
     fontSize: isMobile ? "17px" : "18px",
     fontWeight: "600",
     textAlign: "center",
 });
 
-const valueStyle = (isMobile) => ({
+const valueStyle = (isMobile, themeColors) => ({
     margin: 0,
-    color: "#5b3b45",
+    color: themeColors.valueColor,
     fontSize: "15px",
     textAlign: "center",
     lineHeight: 1.5,
 });
 
-const reviewStyle = (isMobile) => ({
+const priceStyle = (isMobile, themeColors) => ({
+    margin: 0,
+    color: themeColors.valueColor,
+    fontSize: isMobile ? "20px" : "24px",
+    textAlign: "center",
+    fontWeight: "700",
+});
+
+const reviewStyle = (isMobile, themeColors) => ({
     display: "flex",
     alignItems: "flex-start",
     gap: "10px",
     padding: isMobile ? "10px 12px" : "11px 13px",
     borderRadius: "18px",
-    background: "rgba(255,255,255,0.08)",
-    border: "1px solid rgba(255,255,255,0.25)",
-    color: "#8f4f5d",
+    background: themeColors.reviewBg,
+    border: `1px solid ${themeColors.reviewBorder}`,
+    color: themeColors.valueColor,
     fontSize: "14px",
     marginBottom: "10px",
     wordBreak: "break-word",
-});
-
-const reviewIconStyle = (isMobile) => ({
-    width: isMobile ? "30px" : "32px",
-    height: isMobile ? "30px" : "32px",
-    borderRadius: "50%",
-    objectFit: "cover",
-    flexShrink: 0,
+    transition: "all 0.3s ease",
 });
 
 export default ProductDetails;
