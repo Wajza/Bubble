@@ -3,20 +3,29 @@ const router = express.Router();
 const Product = require("../models/Product");
 
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "bubble-products",
+    allowed_formats: ["jpg", "png", "jpeg"],
   },
 });
 
 const upload = multer({ storage });
 
+// ==========================
 // GET all products
+// ==========================
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find();
@@ -26,7 +35,9 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ==========================
 // GET one product
+// ==========================
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -41,7 +52,9 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// ==========================
 // POST add product
+// ==========================
 router.post("/", upload.single("image"), async (req, res) => {
   try {
     const { name, price, description, stock } = req.body;
@@ -58,9 +71,8 @@ router.post("/", upload.single("image"), async (req, res) => {
       });
     }
 
-    const imageUrl = req.file
-      ? `http://localhost:5000/uploads/${req.file.filename}`
-      : req.body.image;
+
+    const imageUrl = req.file ? req.file.path : req.body.image;
 
     const product = new Product({
       ...req.body,
@@ -76,12 +88,14 @@ router.post("/", upload.single("image"), async (req, res) => {
     console.log(error);
     res.status(500).json({
       message: "Failed to add product",
-      error: error.message
+      error: error.message,
     });
   }
 });
 
+// ==========================
 // PUT update product
+// ==========================
 router.put("/:id", async (req, res) => {
   try {
     if (req.body.price < 0 || req.body.stock < 0) {
@@ -106,7 +120,9 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// ==========================
 // DELETE product
+// ==========================
 router.delete("/:id", async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);

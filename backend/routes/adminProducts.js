@@ -3,14 +3,20 @@ const router = express.Router();
 const Product = require("../models/Product");
 
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "bubble-products",
+    allowed_formats: ["jpg", "png", "jpeg"],
   },
 });
 
@@ -71,9 +77,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       price: Number(price),
       description,
       stock: Number(stock),
-      image: req.file
-        ? `http://localhost:5000/uploads/${req.file.filename}`
-        : req.body.image || "",
+      image: req.file ? req.file.path : req.body.image || "",
       scent: scent || "",
       skinType: normalizeArray(skinType),
       ingredients: normalizeArray(ingredients),
@@ -131,7 +135,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     }
 
     if (req.file) {
-      updatedData.image = `http://localhost:5000/uploads/${req.file.filename}`;
+      updatedData.image = req.file.path;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
