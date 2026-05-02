@@ -17,8 +17,8 @@ const slideAnimation = `
 
 function Home() {
   const navigate = useNavigate();
-    const userId = getCurrentUserId();
-    const isLoggedIn = !!userId;
+  const userId = getCurrentUserId();
+  const isLoggedIn = !!userId;
 
   const [products, setProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -50,37 +50,37 @@ function Home() {
 
   useEffect(() => {
     if (!userId || !product) return;
-    
+
     const checkWishlist = async () => {
       try {
         const response = await fetch(`http://localhost:5000/api/wishlist/${userId}`);
         const data = await response.json();
         setLiked(data.some((item) => item.productId?._id === product._id));
-      } catch (error) { 
-        console.error(error); 
+      } catch (error) {
+        console.error(error);
       }
     };
-    
+
     checkWishlist();
     window.addEventListener("wishlistUpdated", checkWishlist);
     return () => window.removeEventListener("wishlistUpdated", checkWishlist);
   }, [userId, product]);
 
   const handleWishlist = async () => {
-    if (!isLoggedIn) { 
-      navigate("/"); 
-      return; 
+    if (!isLoggedIn) {
+      navigate("/");
+      return;
     }
     if (!product) return;
-    
+
     try {
       if (liked) {
         const response = await fetch(`http://localhost:5000/api/wishlist/${userId}`);
         const data = await response.json();
         const wishlistItem = data.find((item) => item.productId?._id === product._id);
         if (wishlistItem) {
-          await fetch(`http://localhost:5000/api/wishlist/${wishlistItem._id}`, { 
-            method: "DELETE" 
+          await fetch(`http://localhost:5000/api/wishlist/${wishlistItem._id}`, {
+            method: "DELETE"
           });
         }
         setLiked(false);
@@ -88,36 +88,48 @@ function Home() {
         await fetch("http://localhost:5000/api/wishlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             userId: userId,  // Use actual userId
-            productId: product._id, 
-            quantity: 1 
+            productId: product._id,
+            quantity: 1
           }),
         });
         setLiked(true);
       }
       window.dispatchEvent(new Event("wishlistUpdated"));
-    } catch (error) { 
-      console.error(error); 
-      alert("Failed to update wishlist"); 
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update wishlist");
     }
   };
 
-  const handleAddToCart = () => {
-    if (!isLoggedIn) { navigate("/"); return; }
-    if (!product) return;
-    let storedCart = JSON.parse(localStorage.getItem("cartItems")) || [];
-    const existingItem = storedCart.find((item) => item.id === product._id);
-    if (existingItem) {
-      storedCart = storedCart.map((item) =>
-        item.id === product._id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    } else {
-      storedCart.push({ id: product._id, quantity: 1 });
+  const handleAddToCart = async () => {
+    if (!isLoggedIn) {
+      navigate("/");
+      return;
     }
-    localStorage.setItem("cartItems", JSON.stringify(storedCart));
-    setCartMessage("Added to cart");
-    setTimeout(() => setCartMessage(""), 2000);
+    if (!product) return;
+
+    try {
+      await fetch("http://localhost:5000/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          productId: product._id,
+          quantity: 1,
+        }),
+      });
+
+      setCartMessage("Added to cart");
+      setTimeout(() => setCartMessage(""), 2000);
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to add to cart");
+    }
   };
 
   const handleMoreDetails = () => {
@@ -146,9 +158,11 @@ function Home() {
       <img src={bubble8} alt="bubble right"
         style={{ position: "absolute", right: "2px", top: "20px", width: "500px", opacity: 0.9, zIndex: 0, pointerEvents: "none" }} />
 
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column",
+      <div style={{
+        minHeight: "100vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        paddingTop: "40px", position: "relative", zIndex: 2 }}>
+        paddingTop: "40px", position: "relative", zIndex: 2
+      }}>
 
         {product && (
           <img
@@ -173,16 +187,20 @@ function Home() {
           <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Button text="Add to Cart" variant="primary" onClick={handleAddToCart} />
             {cartMessage && (
-              <span style={{ position: "absolute", top: "110%", color: "#226944",
-                fontSize: "14px", fontWeight: "500", whiteSpace: "nowrap" }}>
+              <span style={{
+                position: "absolute", top: "110%", color: "#226944",
+                fontSize: "14px", fontWeight: "500", whiteSpace: "nowrap"
+              }}>
                 {cartMessage}
               </span>
             )}
           </div>
           <Button text="More Details" variant="secondary" onClick={handleMoreDetails} />
           <img src={liked ? heartFilled : heart} alt="wishlist" onClick={handleWishlist}
-            style={{ width: "22px", height: "22px", cursor: "pointer", transition: "0.3s",
-              transform: liked ? "scale(1.2)" : "scale(1)", opacity: liked ? 1 : 0.7 }} />
+            style={{
+              width: "22px", height: "22px", cursor: "pointer", transition: "0.3s",
+              transform: liked ? "scale(1.2)" : "scale(1)", opacity: liked ? 1 : 0.7
+            }} />
         </div>
 
         {/* Dots - ثابتة */}
