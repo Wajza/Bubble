@@ -11,22 +11,34 @@ import {
   Cell,
 } from "recharts";
 import AdminSidebar from "../components/AdminSidebar";
+import { getAuthToken } from "../utils/auth";
 
 function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [salesFilter, setSalesFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDashboard() {
       try {
+        const token = getAuthToken();
+        
         const response = await fetch(
-          `http://localhost:5000/api/admin/dashboard?salesFilter=${salesFilter}`
+          `http://localhost:5000/api/admin/dashboard?salesFilter=${salesFilter}`,
+          {
+            headers: {
+              "Authorization": token ? `Bearer ${token}` : "",
+              "Content-Type": "application/json"
+            }
+          }
         );
 
         const data = await response.json();
         setDashboardData(data);
       } catch (error) {
         console.error("Failed to fetch dashboard:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -51,6 +63,30 @@ function AdminDashboard() {
 
     return date.toLocaleDateString("en-GB");
   };
+
+  const getCustomerName = (order) => {
+    // Try to get customer name from different possible fields
+    if (order.customer?.fullName) return order.customer.fullName;
+    if (order.customer?.name) return order.customer.name;
+    if (order.userId) {
+      // If userId is available but not populated, show ID
+      return order.userId.length > 8 ? `${order.userId.slice(-8)}` : order.userId;
+    }
+    return "Guest User";
+  };
+
+  if (loading) {
+    return (
+      <div className="purple-page" style={{ minHeight: "100vh", padding: "26px 24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "16px" }}>
+          <AdminSidebar activePage="dashboard" />
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "500px" }}>
+            Loading dashboard data...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -184,11 +220,11 @@ function AdminDashboard() {
                         <tr key={order._id || index}>
                           <td style={tdStyle}>
                             {order._id ? `#${order._id.slice(-5)}` : `#${1000 + index}`}
-                          </td>
+                           </td>
 
                           <td style={tdStyle}>
-                            {order.customer?.fullName || order.userId || "User"}
-                          </td>
+                            {getCustomerName(order)}
+                           </td>
 
                           <td style={tdStyle}>
                             $
@@ -196,21 +232,21 @@ function AdminDashboard() {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
                             })}
-                          </td>
+                           </td>
 
                           <td style={tdStyle}>
                             <span
                               style={{
                                 ...statusStyle,
                                 background:
-                                  order.status === "Shipped" ? "#b4e6b7" : "#ffd7a6",
+                                  order.status === "Shipped" || order.status === "Delivered" ? "#b4e6b7" : "#ffd7a6",
                                 color:
-                                  order.status === "Shipped" ? "#2f9a3b" : "#d87017",
+                                  order.status === "Shipped" || order.status === "Delivered" ? "#2f9a3b" : "#d87017",
                               }}
                             >
                               {order.status || "Processing"}
                             </span>
-                          </td>
+                           </td>
 
                           <td style={tdStyle}>{formatDate(order.createdAt)}</td>
                         </tr>
