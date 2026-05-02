@@ -3,8 +3,57 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/api";
 import logo from "../assets/bubble-logo.png";
-import cart from "../assets/cart.png";
-import profile from "../assets/profile-picture.png";
+
+// Cart Icon SVG
+const CartIcon = ({ color = "#333", hoverColor = "#8f4bd8" }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const strokeColor = isHovered ? hoverColor : color;
+  
+  return (
+    <svg 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke={strokeColor}
+      strokeWidth="2"
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      style={{ cursor: "pointer", transition: "all 0.3s ease" }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <circle cx="9" cy="21" r="1" fill={strokeColor} stroke={strokeColor}/>
+      <circle cx="20" cy="21" r="1" fill={strokeColor} stroke={strokeColor}/>
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+  );
+};
+
+// Profile Icon SVG
+const ProfileIcon = ({ color = "#333", hoverColor = "#8f4bd8" }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const strokeColor = isHovered ? hoverColor : color;
+  
+  return (
+    <svg 
+      width="28" 
+      height="28" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke={strokeColor}
+      strokeWidth="2"
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      style={{ cursor: "pointer", transition: "all 0.3s ease" }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+};
 
 function Navbar() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -117,29 +166,9 @@ function Navbar() {
             </div>
           )}
 
-          <img
-            src={cart}
-            alt="Cart"
-            onClick={() => navigate("/cart")}
-            style={{
-              width: isMobile ? "20px" : "24px",
-              objectFit: "contain",
-              cursor: "pointer",
-            }}
-          />
-
-          <img
-            src={profile}
-            alt="Profile"
-            onClick={() => navigate("/profile")}
-            style={{
-              width: isMobile ? "26px" : "34px",
-              height: isMobile ? "26px" : "34px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              cursor: "pointer",
-            }}
-          />
+          <CartIcon />
+          
+          <ProfileIcon />
 
           <button
             onClick={handleLogout}
