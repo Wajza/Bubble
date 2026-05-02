@@ -1,4 +1,3 @@
-// backend/routes/adminProducts.js
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
@@ -23,19 +22,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (extname && mimetype) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only image files are allowed"));
-  }
-};
-
-const upload = multer({ storage, fileFilter });
+const upload = multer({ storage });
 
 function normalizeArray(value) {
   if (!value) return [];
@@ -60,10 +47,6 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (!name || price === undefined || !description || stock === undefined) {
       return res.status(400).json({ message: "Name, price, description, and stock are required" });
-    }
-
-    if (Number(price) < 0 || Number(stock) < 0) {
-      return res.status(400).json({ message: "Price and stock must be positive numbers" });
     }
 
     const imageUrl = req.file
@@ -96,27 +79,10 @@ router.put("/:id", upload.single("image"), async (req, res) => {
   try {
     const updatedData = { ...req.body };
 
-    if (updatedData.price !== undefined) {
-      updatedData.price = Number(updatedData.price);
-      if (updatedData.price < 0) {
-        return res.status(400).json({ message: "Price cannot be negative" });
-      }
-    }
-
-    if (updatedData.stock !== undefined) {
-      updatedData.stock = Number(updatedData.stock);
-      if (updatedData.stock < 0) {
-        return res.status(400).json({ message: "Stock cannot be negative" });
-      }
-    }
-
-    if (updatedData.ingredients !== undefined) {
-      updatedData.ingredients = normalizeArray(updatedData.ingredients);
-    }
-
-    if (updatedData.skinType !== undefined) {
-      updatedData.skinType = normalizeArray(updatedData.skinType);
-    }
+    if (updatedData.price !== undefined) updatedData.price = Number(updatedData.price);
+    if (updatedData.stock !== undefined) updatedData.stock = Number(updatedData.stock);
+    if (updatedData.ingredients !== undefined) updatedData.ingredients = normalizeArray(updatedData.ingredients);
+    if (updatedData.skinType !== undefined) updatedData.skinType = normalizeArray(updatedData.skinType);
 
     if (req.file) {
       updatedData.image = `http://localhost:5000/uploads/${req.file.filename}`;
