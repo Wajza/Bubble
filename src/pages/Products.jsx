@@ -17,6 +17,7 @@ function Products() {
     fetch("http://localhost:5000/api/products")
       .then(res => res.json())
       .then(data => {
+        console.log("PRODUCTS:", data);
         const customSoap = {
           _id: "custom-soap",
           name: "Custom Soap",
@@ -27,8 +28,14 @@ function Products() {
           stock: 1,
           customizable: true
         };
-        setAllProducts([...data, customSoap]);
-        setFilteredProducts([...data, customSoap]);
+        const productsWithoutCustom = data.filter(
+          (p) => p.name !== "Custom Soap"
+        );
+
+        const finalProducts = [...productsWithoutCustom, customSoap];
+
+        setAllProducts(finalProducts);
+        setFilteredProducts(finalProducts);
       })
       .catch(err => console.log(err));
   }, []);

@@ -16,7 +16,7 @@ function Card({ product }) {
     // Check if product is in wishlist
     useEffect(() => {
         if (!userId) return;
-        
+
         const checkWishlist = async () => {
             try {
                 const response = await fetch(`http://localhost:5000/api/wishlist/${userId}`);
@@ -29,7 +29,7 @@ function Card({ product }) {
         };
 
         checkWishlist();
-        
+
         window.addEventListener("wishlistUpdated", checkWishlist);
         return () => window.removeEventListener("wishlistUpdated", checkWishlist);
     }, [product._id, userId]);
@@ -69,14 +69,14 @@ function Card({ product }) {
                 });
                 setLiked(true);
             }
-            
+
             window.dispatchEvent(new Event("wishlistUpdated"));
         } catch (error) {
             console.error(error);
             alert("Failed to update wishlist");
         }
     };
-    
+
     // Add product to cart
     const handleAddToCart = async () => {
         if (!isLoggedIn) {
@@ -169,19 +169,27 @@ function Card({ product }) {
                             maxWidth: "150px",
                             maxHeight: "120px",
                             objectFit: "contain",
-                            display: "block",
                         }}
                     />
-                ) : (
+                ) : product._id === "custom-soap" ? (
+                
                     <div
                         style={{
                             fontSize: "80px",
-                            fontWeight: "100",
                             color: "#b07ae8",
-                            lineHeight: 1,
                         }}
                     >
                         +
+                    </div>
+                ) : (
+                   
+                    <div
+                        style={{
+                            fontSize: "14px",
+                            color: "#aaa",
+                        }}
+                    >
+                        No Image
                     </div>
                 )}
             </div>
