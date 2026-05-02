@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
 
 function FAQTemplates() {
+  const [showForm, setShowForm] = useState(false);
   const { themeData } = useTheme();
   const [faqs, setFaqs] = useState([]);
   const [showAll, setShowAll] = useState(false);
@@ -41,7 +42,7 @@ function FAQTemplates() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setForm({ question: "", answer: "" });
+    setForm({ question: " ", answer: " " });
     setIsEditing(false);
     setEditId(null);
     loadFaqs();
@@ -93,6 +94,7 @@ function FAQTemplates() {
           <button onClick={() => {
             setIsEditing(false);
             setForm({ question: "", answer: "" });
+            setShowForm(true); 
           }} style={{
             background: themeData.primary,
             color: "white",
@@ -159,7 +161,7 @@ function FAQTemplates() {
       </div>
 
       {/* Add/Edit Form */}
-      {(form.question || form.answer || isEditing) && (
+      {showForm && (
         <div style={{
           background: "rgba(255,255,255,0.08)",
           borderRadius: "20px",
@@ -208,6 +210,7 @@ function FAQTemplates() {
               setIsEditing(false);
               setEditId(null);
               setForm({ question: "", answer: "" });
+              setShowForm(false); 
             }} style={{
               background: "#ccc",
               color: "#333",
