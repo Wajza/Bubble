@@ -140,10 +140,10 @@ function Navbar() {
               transition: "all 0.3s ease",
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = "rgba(255,255,255,0.16)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.16)";
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
             }}
           >
             <LogoutIcon size={16} />
